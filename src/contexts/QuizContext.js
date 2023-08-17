@@ -115,6 +115,8 @@ function useQuiz() {
 
   if (context === undefined)
     throw new Error("Context used outside of Quiz provider");
+
+  return context;
 }
 
 // 4) Use export naming to broacast the Provider and the Custom Hook
