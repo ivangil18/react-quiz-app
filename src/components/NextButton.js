@@ -1,5 +1,9 @@
-function Controls({ ansewer, dispatch, index, numQuestions }) {
-  if (ansewer === null) return null;
+import { useQuiz } from "../contexts/QuizContext";
+
+function NextButton() {
+  const { answer, dispatch, index, numQuestions } = useQuiz();
+
+  if (answer === null) return null;
 
   return (
     <div>
@@ -23,4 +27,4 @@ function Controls({ ansewer, dispatch, index, numQuestions }) {
   );
 }
 
-export default Controls;
+export default NextButton;

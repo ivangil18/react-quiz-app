@@ -12,12 +12,18 @@ const initialState = {
   points: 0,
   highscore: 0,
   secondsRemaining: null,
+  currQuestion: null,
 };
 
 function reducer(state, action) {
   switch (action.type) {
     case "dataReceived":
-      return { ...state, questions: action.payload, status: "ready" };
+      return {
+        ...state,
+        questions: action.payload,
+        status: "ready",
+        currQuestion: state.questions[state.index],
+      };
     case "dataFailed":
       return { ...state, status: "error" };
     case "quiz/started":
@@ -37,7 +43,12 @@ function reducer(state, action) {
         points: state.points + gainedPoints,
       };
     case "nextQuestion":
-      return { ...state, index: state.index++, answer: null };
+      return {
+        ...state,
+        index: state.index++,
+        answer: null,
+        currQuestion: state.questions[state.index],
+      };
     case "finish":
       return {
         ...state,
@@ -73,6 +84,7 @@ function QuizProvider({ children }) {
   const [
     { questions, status, index, points, answer, highscore, secondsRemaining },
     dispatch,
+    currQuestion,
   ] = useReducer(reducer, initialState);
 
   const numQuestions = questions.length;
@@ -82,12 +94,15 @@ function QuizProvider({ children }) {
     0
   );
 
-  useEffect(function () {
-    fetch("http://localhost:9000/questions")
-      .then((res) => res.json())
-      .then((data) => dispatch({ type: "dataReceived", payload: data }))
-      .catch((err) => dispatch({ type: "dataFailed" }));
-  }, []);
+  useEffect(
+    function () {
+      fetch("http://localhost:9000/questions")
+        .then((res) => res.json())
+        .then((data) => dispatch({ type: "dataReceived", payload: data }))
+        .catch((err) => dispatch({ type: "dataFailed" }));
+    },
+    [dispatch]
+  );
 
   return (
     <QuizContext.Provider
@@ -102,6 +117,7 @@ function QuizProvider({ children }) {
         numQuestions,
         totalPoints,
         dispatch,
+        currQuestion,
       }}
     >
       {children}
